@@ -1,10 +1,10 @@
 {
-  "lib/WpAssetManager/*.php": {
+  "lib/WpOptionsManager/*.php": {
     "type": "library",
-    "test": "test/WpAssetManager/%sTest.php"
+    "test": "test/WpOptionsManager/%sTest.php"
   },
-  "test/WpAssetManager/*Test.php": {
+  "test/WpOptionsManager/*Test.php": {
     "type": "test",
-    "alternate": "lib/WpAssetManager/%s.php"
+    "alternate": "lib/WpOptionsManager/%s.php"
   }
 }

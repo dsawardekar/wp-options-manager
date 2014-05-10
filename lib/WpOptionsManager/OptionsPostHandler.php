@@ -4,13 +4,16 @@ namespace WpOptionsManager;
 
 class OptionsPostHandler {
 
-  public $postAction;
   public $container;
   public $pluginMeta;
+  public $optionsFlash;
+  public $optionsValidator;
 
+  public $postAction = null;
   public $redirectTo = '';
   public $didDeny = false;
   public $didQuit = false;
+  public $denyReason = '';
 
   function needs() {
     return array('pluginMeta', 'optionsFlash', 'optionsValidator');

@@ -8,6 +8,8 @@ class PluginMeta {
   public $optionsCapability;
   public $defaultOptions;
   public $slug;
+  public $optionsPageTitle;
+  public $optionsMenuTitle;
 
   function getSlug() {
     return $this->slug;

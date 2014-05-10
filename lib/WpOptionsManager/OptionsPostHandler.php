@@ -14,6 +14,7 @@ class OptionsPostHandler {
   public $didDeny = false;
   public $didQuit = false;
   public $denyReason = '';
+  public $didEnable = false;
 
   function needs() {
     return array('pluginMeta', 'optionsFlash', 'optionsValidator');
@@ -21,11 +22,16 @@ class OptionsPostHandler {
 
   function enable() {
     add_action($this->getPostAction(), array($this, 'process'));
+    $this->didEnable = true;
   }
 
   function process() {
     if ($this->isPOST() === false) {
       return $this->deny('not_post');
+    }
+
+    if ($this->isValidReferer() === false) {
+      return $this->deny('invalid_referer');
     }
 
     if ($this->isValidNonce() === false) {
@@ -57,7 +63,7 @@ class OptionsPostHandler {
 
   function getNonceName() {
     $prefix = $this->getPostAction();
-    $name = "$prefix-nonce";
+    $name   = $prefix . "_wpnonce";
 
     return str_replace('-', '_', $name);
   }
@@ -121,6 +127,18 @@ class OptionsPostHandler {
 
   function isPOST() {
     return array_key_exists('REQUEST_METHOD', $_SERVER) && $_SERVER['REQUEST_METHOD'] === 'POST';
+  }
+
+  function isValidReferer() {
+    return $this->getReferer() === $this->pluginMeta->getOptionsUrl();
+  }
+
+  function getReferer() {
+    if (array_key_exists('HTTP_REFERER', $_SERVER)) {
+      return $_SERVER['HTTP_REFERER'];
+    } else {
+      return '';
+    }
   }
 
   function isValidNonce() {

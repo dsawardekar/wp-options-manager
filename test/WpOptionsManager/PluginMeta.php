@@ -21,6 +21,22 @@ class PluginMeta {
     return $this->optionsCapability;
   }
 
+  function getOptionsPageTitle() {
+    return $this->optionsPageTitle;
+  }
+
+  function getOptionsMenuTitle() {
+    return $this->optionsMenuTitle;
+  }
+
+  function getOptionsPageSlug() {
+    return $this->getSlug() . '-options';
+  }
+
+  function getOptionsMenuSlug() {
+    return $this->getSlug();
+  }
+
   function getDefaultOptions() {
     return $this->defaultOptions;
   }

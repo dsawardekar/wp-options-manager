@@ -5,6 +5,7 @@ namespace WpOptionsManager;
 class PluginMeta {
 
   public $optionsKey;
+  public $optionsCapability;
   public $defaultOptions;
   public $slug;
 

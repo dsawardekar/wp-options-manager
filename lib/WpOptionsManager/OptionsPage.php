@@ -9,9 +9,11 @@ class OptionsPage {
   public $optionsStore;
   public $optionsFlash;
   public $optionsPostHandler;
+  public $twigHelper;
 
   public $didSuccess = false;
   public $didErrors  = false;
+  public $flash      = null;
 
   function needs() {
     return array(

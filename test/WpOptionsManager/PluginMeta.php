@@ -10,9 +10,14 @@ class PluginMeta {
   public $slug;
   public $optionsPageTitle;
   public $optionsMenuTitle;
+  public $dir;
 
   function getSlug() {
     return $this->slug;
+  }
+
+  function getDir() {
+    return $this->dir;
   }
 
   function getOptionsKey() {

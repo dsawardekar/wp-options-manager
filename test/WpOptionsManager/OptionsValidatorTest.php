@@ -17,15 +17,15 @@ class OptionsValidatorTest extends \WP_UnitTestCase {
   }
 
   function test_it_knows_if_input_is_not_valid() {
-    $rules = [
-        'required' => [
-            ['foo'],
-            ['bar']
-        ],
-        'length' => [
-            ['foo', 3]
-        ]
-    ];
+    $rules = array(
+        'required' => array(
+            array('foo'),
+            array('bar')
+        ),
+        'length' => array(
+            array('foo', 3)
+        )
+    );
 
     $this->validator->rules = $rules;
     $result = $this->validator->validate([]);
@@ -33,20 +33,20 @@ class OptionsValidatorTest extends \WP_UnitTestCase {
   }
 
   function test_it_knows_if_input_is_valid() {
-    $rules = [
-        'required' => [
-            ['foo'],
-            ['bar']
-        ],
-        'length' => [
-            ['foo', 3]
-        ]
-    ];
+    $rules = array(
+        'required' => array(
+            array('foo'),
+            array('bar')
+        ),
+        'length' => array(
+            array('foo', 3)
+        )
+    );
 
-    $input = [
+    $input = array(
       'foo' => 'lor',
       'bar' => 'yes'
-    ];
+    );
 
     $this->validator->rules = $rules;
     $result = $this->validator->validate($input);
@@ -54,16 +54,16 @@ class OptionsValidatorTest extends \WP_UnitTestCase {
   }
 
   function test_it_has_errors_if_input_is_not_valid() {
-    $input = [
+    $input = array(
       'bar' => 'two'
-    ];
+    );
 
-    $rules = [
-        'required' => [
-            ['foo'],
-            ['bar']
-        ]
-    ];
+    $rules = array(
+        'required' => array(
+            array('foo'),
+            array('bar')
+        )
+    );
 
     $this->validator->rules = $rules;
     $result = $this->validator->validate($input);
@@ -72,14 +72,14 @@ class OptionsValidatorTest extends \WP_UnitTestCase {
   }
 
   function test_it_can_use_custom_rules() {
-    $rules = [
-      'customRule' => [
-        ['foo']
-      ]
-    ];
+    $rules = array(
+      'customRule' => array(
+        array('foo')
+      )
+    );
 
     $this->validator->rules = $rules;
-    $input = ['foo' => 'foo'];
+    $input = array('foo' => 'foo');
     $result = $this->validator->validate($input);
     $this->assertTrue($result);
   }

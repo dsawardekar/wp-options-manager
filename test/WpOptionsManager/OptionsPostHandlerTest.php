@@ -17,7 +17,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
 
     $this->pluginMeta = new PluginMeta();
     $this->pluginMeta->optionsKey = 'post-handler-plugin-options';
-    $this->pluginMeta->defaultOptions = ['foo' => 'bar'];
+    $this->pluginMeta->defaultOptions = array('foo' => 'bar');
     $this->pluginMeta->optionsCapability = 'manage_options';
     $this->pluginMeta->slug = 'post-handler-plugin';
 

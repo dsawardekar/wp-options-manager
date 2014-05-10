@@ -73,4 +73,11 @@ class OptionsFlashTest extends \WP_UnitTestCase {
     $this->assertFalse(get_transient($this->flash->keyName()));
   }
 
+  function test_it_can_get_value_of_saved_flash() {
+    $this->flash->save(array('lorem' => 'ipsum'));
+    $value = $this->flash->getValue();
+
+    $this->assertEquals('ipsum', $value['lorem']);
+  }
+
 }

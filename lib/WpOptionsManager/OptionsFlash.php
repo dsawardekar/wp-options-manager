@@ -60,6 +60,11 @@ class OptionsFlash {
     return $this->value !== false;
   }
 
+  function getValue() {
+    $this->load();
+    return $this->value;
+  }
+
   function parse($json) {
     if ($json !== false) {
       $value = json_decode($json, true);

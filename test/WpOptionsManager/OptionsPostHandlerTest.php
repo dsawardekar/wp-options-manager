@@ -53,7 +53,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
 
   function test_it_has_nonce_name() {
     $actual = $this->handler->getNonceName();
-    $this->assertEquals('admin_post_post_handler_plugin_options_post_nonce', $actual);
+    $this->assertEquals('admin_post_post_handler_plugin_options_post_wpnonce', $actual);
   }
 
   function test_it_knows_if_request_is_not_a_POST() {
@@ -183,6 +183,24 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
     $this->assertEquals(2, count($value['errors']));
   }
 
+  function test_it_can_get_current_referer() {
+    $_SERVER['HTTP_REFERER'] = 'foo';
+    $this->assertEquals('foo', $this->handler->getReferer());
+  }
+
+  function test_it_returns_empty_referer_if_not_found() {
+    $this->assertEquals('', $this->handler->getReferer());
+  }
+
+  function test_it_knows_if_referer_is_invalid() {
+    $this->assertFalse($this->handler->isValidReferer());
+  }
+
+  function test_it_knows_if_referer_is_valid() {
+    $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
+    $this->assertTrue($this->handler->isValidReferer());
+  }
+
   /* integration tests */
 
   function test_it_denies_a_GET_request() {
@@ -194,8 +212,28 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
     $this->assertEquals('not_post', $this->handler->denyReason);
   }
 
+  function test_it_denies_a_request_with_an_invalid_referer() {
+    $_SERVER['REQUEST_METHOD'] = 'POST';
+    $_SERVER['HTTP_REFERER'] = 'foo';
+    $this->handler->enable();
+    do_action($this->handler->getPostAction());
+
+    $this->assertTrue($this->handler->didDeny);
+    $this->assertEquals('invalid_referer', $this->handler->denyReason);
+  }
+
+  function test_it_denies_a_request_without_a_referer() {
+    $_SERVER['REQUEST_METHOD'] = 'POST';
+    $this->handler->enable();
+    do_action($this->handler->getPostAction());
+
+    $this->assertTrue($this->handler->didDeny);
+    $this->assertEquals('invalid_referer', $this->handler->denyReason);
+  }
+
   function test_it_denies_a_request_without_a_nonce() {
     $_SERVER['REQUEST_METHOD'] = 'POST';
+    $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
     $this->handler->enable();
     do_action($this->handler->getPostAction());
 
@@ -205,6 +243,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
 
   function test_it_denies_a_request_if_invalid_nonce() {
     $_SERVER['REQUEST_METHOD'] = 'POST';
+    $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
     $_POST[$this->handler->getNonceName()] = 'foo';
     $this->handler->enable();
     do_action($this->handler->getPostAction());
@@ -215,6 +254,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
 
   function test_it_denies_a_request_if_not_logged_in() {
     $_SERVER['REQUEST_METHOD'] = 'POST';
+    $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
     $_POST[$this->handler->getNonceName()] = wp_create_nonce($this->handler->getPostAction());
     $this->handler->enable();
     do_action($this->handler->getPostAction());
@@ -228,6 +268,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
     wp_set_current_user($id);
 
     $_SERVER['REQUEST_METHOD'] = 'POST';
+    $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
     $_POST[$this->handler->getNonceName()] = wp_create_nonce($this->handler->getPostAction());
     $this->handler->enable();
     do_action($this->handler->getPostAction());
@@ -254,6 +295,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
 
     wp_set_current_user(1);
     $_SERVER['REQUEST_METHOD'] = 'POST';
+    $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
     $_POST[$this->handler->getNonceName()] = wp_create_nonce($this->handler->getPostAction());
     $this->handler->enable();
     do_action($this->handler->getPostAction());
@@ -282,6 +324,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
 
     wp_set_current_user(1);
     $_SERVER['REQUEST_METHOD'] = 'POST';
+    $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
     $_POST[$this->handler->getNonceName()] = wp_create_nonce($this->handler->getPostAction());
     $this->handler->enable();
     do_action($this->handler->getPostAction());

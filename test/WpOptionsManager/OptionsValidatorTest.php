@@ -28,7 +28,7 @@ class OptionsValidatorTest extends \WP_UnitTestCase {
     );
 
     $this->validator->rules = $rules;
-    $result = $this->validator->validate([]);
+    $result = $this->validator->validate(array());
     $this->assertFalse($result);
   }
 

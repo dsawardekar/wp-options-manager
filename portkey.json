@@ -1,0 +1,10 @@
+{
+  "lib/WpOptionsManager/*.php": {
+    "type": "library",
+    "test": "test/WpOptionsManager/%sTest.php"
+  },
+  "test/WpOptionsManager/*Test.php": {
+    "type": "test",
+    "alternate": "lib/WpOptionsManager/%s.php"
+  }
+}

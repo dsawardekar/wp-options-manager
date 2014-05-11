@@ -278,6 +278,22 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
     $this->assertEquals('not_enough_permissions', $this->handler->denyReason);
   }
 
+  function test_it_resets_options_if_reset_request() {
+    wp_set_current_user(1);
+
+    $_SERVER['REQUEST_METHOD'] = 'POST';
+    $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
+    $_POST[$this->handler->getNonceName()] = wp_create_nonce($this->handler->getPostAction());
+    $_POST['reset'] = 'Restore Defaults';
+
+    $this->handler->enable();
+    do_action('admin_post_' . $this->handler->getPostAction());
+
+    $this->assertEquals($this->pluginMeta->getOptionsUrl(), $this->handler->redirectTo);
+    $this->assertTrue($this->handler->didQuit);
+    $this->assertFalse(get_option($this->pluginMeta->getOptionsKey()));
+  }
+
   function test_it_validates_a_request_with_valid_user_input() {
     $rules = array(
         'required' => array(

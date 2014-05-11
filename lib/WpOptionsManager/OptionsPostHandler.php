@@ -52,7 +52,9 @@ class OptionsPostHandler {
       return $this->deny('not_enough_permissions');
     }
 
-    if ($this->validate() === true) {
+    if ($this->isResetRequest()) {
+      $this->reset();
+    } elseif ($this->validate() === true) {
       $this->save();
     }
 
@@ -107,6 +109,11 @@ class OptionsPostHandler {
     }
 
     return $valid;
+  }
+
+  function reset() {
+    $this->optionsStore->clear();
+    $this->saveSuccess();
   }
 
   function save() {
@@ -215,6 +222,14 @@ class OptionsPostHandler {
 
   function isPHPUnit() {
     return defined('PHPUNIT_RUNNER');
+  }
+
+  function isResetRequest() {
+    return array_key_exists('reset', $_POST);
+  }
+
+  function isSubmitRequest() {
+    return array_key_exists('submit', $_POST);
   }
 
 }

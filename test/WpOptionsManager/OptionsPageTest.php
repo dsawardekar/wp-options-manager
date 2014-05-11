@@ -92,15 +92,8 @@ class OptionsPageTest extends \WP_UnitTestCase {
 
   function test_it_can_add_options_page() {
     $this->page->registerOptionsPage();
-    /* TODO: how to test this */
+    /* TODO: how to test this? */
   }
-
-  /* TODO: not enabling the handler allows more flexibility
-  function test_it_can_register_options_page() {
-    $this->page->register();
-    $this->assertTrue($this->handler->didEnable);
-  }
-   */
 
   function test_it_passes_nonce_field_to_page_template_context() {
     $context = $this->page->getPageTemplateContext();

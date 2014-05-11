@@ -27,7 +27,6 @@ class OptionsPage {
 
   function register() {
     $this->registerOptionsPage();
-    $this->optionsPostHandler->enable();
   }
 
   function registerOptionsPage() {
@@ -66,6 +65,10 @@ class OptionsPage {
       false, false
     );
 
+    $context['formUrl'] = admin_url(
+      'admin-post.php?action=' . $this->optionsPostHandler->getPostAction()
+    );
+
     return $context;
   }
 
@@ -79,6 +82,35 @@ class OptionsPage {
       $this->registerSuccess();
     } elseif (array_key_exists('errors', $this->flash)) {
       $this->registerErrors($this->flash['errors']);
+    }
+  }
+
+  function getOption($key) {
+    if ($this->hasInputs()) {
+      $input = $this->getInput($key);
+    } else {
+      $input = false;
+    }
+
+    if ($input === false) {
+      return $this->optionsStore->getOption($key);
+    } else {
+      return $input;
+    }
+  }
+
+  function hasInputs() {
+    return !is_null($this->flash) &&
+      $this->flash !== false &&
+      array_key_exists('inputs', $this->flash);
+  }
+
+  function getInput($key) {
+    $inputs = $this->flash['inputs'];
+    if (array_key_exists($key, $inputs)) {
+      return $inputs[$key];
+    } else {
+      return false;
     }
   }
 

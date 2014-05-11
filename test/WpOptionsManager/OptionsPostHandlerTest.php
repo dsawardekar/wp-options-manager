@@ -26,15 +26,16 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
       ->object('pluginMeta', $this->pluginMeta)
       ->singleton('optionsFlash', 'WpOptionsManager\OptionsFlash')
       ->singleton('optionsValidator', 'WpOptionsManager\MyOptionsValidator')
+      ->singleton('optionsStore', 'WpOptionsManager\OptionsStore')
       ->singleton('handler', 'WpOptionsManager\OptionsPostHandler');
 
-    $this->handler = $this->container->lookup('handler');
-    $this->flash = $this->container->lookup('optionsFlash');
+    $this->handler   = $this->container->lookup('handler');
+    $this->flash     = $this->container->lookup('optionsFlash');
     $this->validator = $this->container->lookup('optionsValidator');
   }
 
   function tearDown() {
-    $this->flash->clear();
+    //$this->flash->clear();
   }
 
   function test_it_has_plugin_meta() {
@@ -43,17 +44,17 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
 
   function test_it_has_a_post_action() {
     $actual = $this->handler->getPostAction();
-    $this->assertEquals('admin_post_post-handler-plugin-options-post', $actual);
+    $this->assertEquals('post_handler_plugin_options_post', $actual);
   }
 
   function test_it_can_setup_admin_post_handler() {
     $this->handler->enable();
-    $this->assertTrue(has_action($this->handler->getPostAction()));
+    $this->assertTrue(has_action('admin_post_' . $this->handler->getPostAction()));
   }
 
   function test_it_has_nonce_name() {
     $actual = $this->handler->getNonceName();
-    $this->assertEquals('admin_post_post_handler_plugin_options_post_wpnonce', $actual);
+    $this->assertEquals('post_handler_plugin_options_post_wpnonce', $actual);
   }
 
   function test_it_knows_if_request_is_not_a_POST() {
@@ -206,7 +207,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
   function test_it_denies_a_GET_request() {
     $_SERVER['REQUEST_METHOD'] = 'GET';
     $this->handler->enable();
-    do_action($this->handler->getPostAction());
+    do_action('admin_post_' . $this->handler->getPostAction());
 
     $this->assertTrue($this->handler->didDeny);
     $this->assertEquals('not_post', $this->handler->denyReason);
@@ -216,7 +217,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
     $_SERVER['REQUEST_METHOD'] = 'POST';
     $_SERVER['HTTP_REFERER'] = 'foo';
     $this->handler->enable();
-    do_action($this->handler->getPostAction());
+    do_action('admin_post_' . $this->handler->getPostAction());
 
     $this->assertTrue($this->handler->didDeny);
     $this->assertEquals('invalid_referer', $this->handler->denyReason);
@@ -225,7 +226,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
   function test_it_denies_a_request_without_a_referer() {
     $_SERVER['REQUEST_METHOD'] = 'POST';
     $this->handler->enable();
-    do_action($this->handler->getPostAction());
+    do_action('admin_post_' . $this->handler->getPostAction());
 
     $this->assertTrue($this->handler->didDeny);
     $this->assertEquals('invalid_referer', $this->handler->denyReason);
@@ -235,7 +236,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
     $_SERVER['REQUEST_METHOD'] = 'POST';
     $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
     $this->handler->enable();
-    do_action($this->handler->getPostAction());
+    do_action('admin_post_' . $this->handler->getPostAction());
 
     $this->assertTrue($this->handler->didDeny);
     $this->assertEquals('invalid_nonce', $this->handler->denyReason);
@@ -246,7 +247,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
     $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
     $_POST[$this->handler->getNonceName()] = 'foo';
     $this->handler->enable();
-    do_action($this->handler->getPostAction());
+    do_action('admin_post_' . $this->handler->getPostAction());
 
     $this->assertTrue($this->handler->didDeny);
     $this->assertEquals('invalid_nonce', $this->handler->denyReason);
@@ -257,7 +258,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
     $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
     $_POST[$this->handler->getNonceName()] = wp_create_nonce($this->handler->getPostAction());
     $this->handler->enable();
-    do_action($this->handler->getPostAction());
+    do_action('admin_post_' . $this->handler->getPostAction());
 
     $this->assertTrue($this->handler->didDeny);
     $this->assertEquals('not_logged_in', $this->handler->denyReason);
@@ -271,7 +272,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
     $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
     $_POST[$this->handler->getNonceName()] = wp_create_nonce($this->handler->getPostAction());
     $this->handler->enable();
-    do_action($this->handler->getPostAction());
+    do_action('admin_post_' . $this->handler->getPostAction());
 
     $this->assertTrue($this->handler->didDeny);
     $this->assertEquals('not_enough_permissions', $this->handler->denyReason);
@@ -298,7 +299,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
     $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
     $_POST[$this->handler->getNonceName()] = wp_create_nonce($this->handler->getPostAction());
     $this->handler->enable();
-    do_action($this->handler->getPostAction());
+    do_action('admin_post_' . $this->handler->getPostAction());
 
     $value = $this->flash->getValue();
 
@@ -327,7 +328,7 @@ class OptionsPostHandlerTest extends \WP_UnitTestCase {
     $_SERVER['HTTP_REFERER'] = $this->pluginMeta->getOptionsUrl();
     $_POST[$this->handler->getNonceName()] = wp_create_nonce($this->handler->getPostAction());
     $this->handler->enable();
-    do_action($this->handler->getPostAction());
+    do_action('admin_post_' . $this->handler->getPostAction());
 
     $value = $this->flash->getValue();
 

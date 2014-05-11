@@ -8,6 +8,7 @@ class OptionsPostHandler {
   public $pluginMeta;
   public $optionsFlash;
   public $optionsValidator;
+  public $optionsStore;
 
   public $postAction = null;
   public $redirectTo = '';
@@ -17,11 +18,16 @@ class OptionsPostHandler {
   public $didEnable = false;
 
   function needs() {
-    return array('pluginMeta', 'optionsFlash', 'optionsValidator');
+    return array(
+      'pluginMeta',
+      'optionsFlash',
+      'optionsValidator',
+      'optionsStore'
+    );
   }
 
   function enable() {
-    add_action($this->getPostAction(), array($this, 'process'));
+    add_action('admin_post_' . $this->getPostAction(), array($this, 'process'));
     $this->didEnable = true;
   }
 
@@ -46,7 +52,10 @@ class OptionsPostHandler {
       return $this->deny('not_enough_permissions');
     }
 
-    $this->validate();
+    if ($this->validate() === true) {
+      $this->save();
+    }
+
     $this->redirect();
   }
 
@@ -56,7 +65,8 @@ class OptionsPostHandler {
     }
 
     $optionsKey       = $this->pluginMeta->getOptionsKey();
-    $this->postAction = "admin_post_$optionsKey-post";
+    $this->postAction = "$optionsKey-post";
+    $this->postAction = str_replace('-', '_', $this->postAction);
 
     return $this->postAction;
   }
@@ -95,6 +105,36 @@ class OptionsPostHandler {
     } else {
       $this->saveErrors($this->optionsValidator->errors());
     }
+
+    return $valid;
+  }
+
+  function save() {
+    $defaults = $this->pluginMeta->getDefaultOptions();
+    $store    = $this->optionsStore;
+    $changed  = false;
+
+    foreach ($defaults as $name => $value) {
+      if (array_key_exists($name, $_POST) && is_bool($value)) {
+        // checked fields
+        $store->setOption($name, $this->toBoolean($_POST[$name]));
+        $changed = true;
+      } elseif (array_key_exists($name, $_POST)) {
+        $store->setOption($name, $_POST[$name]);
+        $changed = true;
+      } elseif (is_bool($value)) {
+        $store->setOption($name, false);
+        $changed = true;
+      }
+    }
+
+    if ($changed) {
+      $store->save();
+    }
+  }
+
+  function toBoolean($value) {
+    return filter_var($value, FILTER_VALIDATE_BOOLEAN);
   }
 
   function redirect() {
@@ -121,8 +161,25 @@ class OptionsPostHandler {
   }
 
   function saveErrors($errors) {
-    $json = array('errors' => $errors);
+    $json = array(
+      'errors' => $errors,
+      'inputs' => $this->getUserInputs()
+    );
+
     $this->optionsFlash->save($json);
+  }
+
+  function getUserInputs() {
+    $defaults = $this->pluginMeta->getDefaultOptions();
+    $options = array();
+
+    foreach ($defaults as $name => $value) {
+      if (array_key_exists($name, $_POST)) {
+        $options[$name] = $_POST[$name];
+      }
+    }
+
+    return $options;
   }
 
   function isPOST() {

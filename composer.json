@@ -1,6 +1,6 @@
 {
   "name": "dsawardekar/wp-options-manager",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "library",
   "description": "Object Oriented Settings API for WordPress that supports Multisite",
   "keywords": ["wordpress","settings api", "options", "options manager"],

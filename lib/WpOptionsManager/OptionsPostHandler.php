@@ -121,15 +121,18 @@ class OptionsPostHandler {
     $store    = $this->optionsStore;
     $changed  = false;
 
+    /* only fields in default options are saved */
+    /* default options is effectively a whitelist of valid keys */
     foreach ($defaults as $name => $value) {
       if (array_key_exists($name, $_POST) && is_bool($value)) {
-        // checked fields
+        // checked fields that are present
         $store->setOption($name, $this->toBoolean($_POST[$name]));
         $changed = true;
       } elseif (array_key_exists($name, $_POST)) {
         $store->setOption($name, $_POST[$name]);
         $changed = true;
       } elseif (is_bool($value)) {
+        // checked fields that are absent
         $store->setOption($name, false);
         $changed = true;
       }
